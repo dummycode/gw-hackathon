@@ -40,4 +40,13 @@ class Event extends Model
     protected $hidden = [
         'user_id', 'organization_id',
     ];
+
+    /**
+     * Belongs to relationship
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function organization() {
+        return $this->belongsTo(Organization::class);
+    }
 }

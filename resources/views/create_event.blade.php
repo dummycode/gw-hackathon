@@ -71,7 +71,10 @@
                                 <label for="type" class="col-md-4 col-form-label text-md-right">{{ __('Type') }}</label>
 
                                 <div class="col-md-6">
-                                    <input id="type" type="text" class="form-control{{ $errors->has('type') ? ' is-invalid' : '' }}" name="type" value="{{ old('type') }}" required>
+                                    <select id="type" class="form-control{{ $errors->has('type') ? ' is-invalid' : '' }}" name="type" required>
+                                        <option value="SOCIAL">Social</option>
+                                        <option value="PHILANTHROPY">Philanthropy</option>
+                                    </select>
 
                                     @if ($errors->has('type'))
                                         <span class="invalid-feedback">

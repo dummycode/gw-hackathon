@@ -36,6 +36,9 @@
         a.fill-div.active {
             color: black;
         }
+        p.info {
+            margin: 5px;
+        }
     </style>
 </head>
 <body>
