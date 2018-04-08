@@ -12,18 +12,15 @@
 */
 
 // General routes
-Route::get('/', function () {
-    return view('welcome');
-});
 Route::get('/home', 'HomeController@index')->name('home');
 
 // Event routes
 Route::get('/', 'EventsController@index');
-Route::get('event/{id}', 'EventsController@read');
+Route::get('event/{id}', 'EventsController@read')->name('viewevent');
 Route::get('event', function () {
     return view('create_event');
 })->middleware('auth');
-Route::post('event', 'EventsController@create');
+Route::post('event', 'EventsController@create')->name('event');
 
 // Auth routes
 Auth::routes();

@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
 use App\Core\ParamsValidator;
 use App\Core\Responder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Routing\ControllerMiddlewareOptions;
 use Illuminate\Validation\Validator;
 
 /**
@@ -16,7 +18,7 @@ use Illuminate\Validation\Validator;
  * @package App\Http\Controllers
  * @author Henry Harris <henry@104101110114121.com>
  */
-class AbstractCrudController extends Controller
+class AbstractCrudController
 {
     /** @var Request $request */
     protected $request;
@@ -29,6 +31,9 @@ class AbstractCrudController extends Controller
 
     /** @var array $creationValidation */
     protected $creationValidation;
+
+    /** @var array $middleware */
+    protected $middleware = [];
 
     /** @var Model $model */
     protected $model;
@@ -63,7 +68,7 @@ class AbstractCrudController extends Controller
         try {
             $result = $this->model::findOrFail($id);
         } catch (ModelNotFoundException $mnfe) {
-            return $this->responder->notFoundResponse('No such item found');
+            return $this->responder->notFoundResponse('no such item found');
         }
 
         return $this->responder->successResponse($result, 'read');
@@ -73,41 +78,37 @@ class AbstractCrudController extends Controller
      * POST
      * Show the form for creating a new resource.
      *
+     * @param null $additionalParams
+     * 
      * @return Response
      */
-    public function create()
+    public function create($additionalParams = null)
     {
         // Prepare options for creating item
-        $params = $this->getParams(
-            array_keys($this->validator)
+        $params = array_merge(
+            $additionalParams,
+            $this->request->all()
         );
 
-        $creationValidator = $this->validate($params, $this->creationValidation);
+        $creationValidator = $this->validator->validateParams($params,
+            $this->creationValidation);
 
-        if (!($creationValidator->passes() && $metadataValidator->passes())) {
+        if (!($creationValidator->passes())) {
             return $this->responder->badRequestResponse(
                 'validations failed',
-                array_merge(
-                    $creationValidator->errors()->messages(),
-                    $metadataValidator->errors()->messages()
-                )
+                $creationValidator->errors()
             );
         }
-
-        $params['metadata'] = $metaData;
-
         try {
-            $model = $this->model;
-            /** @var StripeModel $result */
-            $result = $model::create($params);
+            $result = $this->model::create($params);
         } catch (Exception $e) {
             return $this->responder->badRequestResponse(
-                'Unable to create item',
+                'unable to create item',
                 [$e->getMessage()]
             );
         }
 
-        return $this->responder->itemCreatedResponse($result, 'create');
+        return $this->responder->successResponse($result, 'create');;
     }
 
     /**
@@ -164,20 +165,23 @@ class AbstractCrudController extends Controller
 
         return null;
     }
-
+    
     /**
-     * @param array $keys
-     * @return array
+     * Register middleware on the controller.
+     *
+     * @param  array|string|\Closure  $middleware
+     * @param  array   $options
+     * @return \Illuminate\Routing\ControllerMiddlewareOptions
      */
-    protected function getParams($keys = []) {
-        $get = [];
-
-        foreach ($keys as $key) {
-            if ($this->request->exists($key)) {
-                $get[$key] = $this->request->get($key);
-            }
+    public function middleware($middleware, array $options = [])
+    {
+        foreach ((array) $middleware as $m) {
+            $this->middleware[] = [
+                'middleware' => $m,
+                'options' => &$options,
+            ];
         }
 
-        return $get;
+        return new ControllerMiddlewareOptions($options);
     }
 }

@@ -19,6 +19,24 @@
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <style>
+        #event-card {
+            border: 2px solid rgba(0,0,0,.03);
+            margin-bottom:10px;
+            padding: 5px;
+            font-size: 16px;
+        }
+        a.fill-div {
+            display: block;
+            height: 100%;
+            width: 100%;
+            color: black;
+            text-decoration: none;
+        }
+        a.fill-div.active {
+            color: black;
+        }
+    </style>
 </head>
 <body>
     <div id="app">
@@ -44,6 +62,12 @@
                             <li><a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a></li>
                             <li><a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a></li>
                         @else
+                            <li><a class="nav-link" href="{{ route('event') }}">
+                                    <button type="submit" class="btn btn-primary">
+                                        {{ __('New Event') }}
+                                    </button>
+                                </a>
+                            </li>
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                     {{ Auth::user()->name }} <span class="caret"></span>

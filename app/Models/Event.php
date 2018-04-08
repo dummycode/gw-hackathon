@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class Event.
@@ -12,6 +13,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Event extends Model
 {
+    use SoftDeletes;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -25,6 +28,8 @@ class Event extends Model
         'type',
         'description',
         'website',
+        'user_id',
+        'organization_id',
     ];
 
     /**
@@ -33,6 +38,6 @@ class Event extends Model
      * @var array
      */
     protected $hidden = [
-        'organization_id', 'user_id',
+        'user_id', 'organization_id',
     ];
 }

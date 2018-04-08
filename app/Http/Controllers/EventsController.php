@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Core\ParamsValidator;
 use App\Core\Responder;
 use App\Models\Event;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Class EventsController.
@@ -26,8 +28,8 @@ class EventsController extends AbstractCrudController {
         'end' => 'required|date',
         'location' => 'required|string',
         'type' => 'required|string',
-        'description' => 'required|string',
-        'website' => 'required|string',
+        'description' => 'string|nullable',
+        'website' => 'string|nullable',
     ];
 
     /**
@@ -53,7 +55,8 @@ class EventsController extends AbstractCrudController {
      * @return \Illuminate\Http\Response
      */
     public function index() {
-        return view('welcome');
+        $events = DB::table('events')->where('start', '>', now())->orderBy('start')->take(20)->get();
+        return view('home')->with(['events' => $events]);
     }
 
     /**
@@ -71,11 +74,27 @@ class EventsController extends AbstractCrudController {
     /**
      * Create an event
      *
+     * @param null $additionalParams
+     * 
      * @return \Illuminate\Http\Response
      */
-    public function create() {
-        $event = Event::first();
-        return view('event')->with(['event' => $event]);
+    public function create($additionalParams = null) {
+        $additionalParams = [];
+        $user = $this->request->user();
+        $additionalParams['user_id'] = $user->id;
+        $additionalParams['organization_id'] = $user->organization->id;
+
+        /** @var Response $result */
+        $result = parent::create($additionalParams);
+
+        if ($result->isSuccessful()) {
+            $event = Event::find(
+                json_decode($result->content(), true)['data']['id']
+            );
+            return view('event')->with(['event' => $event]);
+        }
+
+        return $result;
     }
 
     /**
