@@ -2,7 +2,15 @@
 
 namespace App\Models;
 
-class Organization
+use Illuminate\Database\Eloquent\Model;
+
+/**
+ * Class Organization.
+ *
+ * @package App\Models
+ * @author Henry Harris <henry@104101110114121.com>
+ */
+class Organization extends Model
 {
     /**
      * The attributes that are mass assignable.

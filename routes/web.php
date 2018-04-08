@@ -11,10 +11,19 @@
 |
 */
 
+// General routes
 Route::get('/', function () {
     return view('welcome');
 });
-
-Auth::routes();
-
 Route::get('/home', 'HomeController@index')->name('home');
+
+// Event routes
+Route::get('/', 'EventsController@index');
+Route::get('event/{id}', 'EventsController@read');
+Route::get('event', function () {
+    return view('create_event');
+})->middleware('auth');
+Route::post('event', 'EventsController@create');
+
+// Auth routes
+Auth::routes();

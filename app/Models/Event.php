@@ -2,7 +2,15 @@
 
 namespace App\Models;
 
-class Event
+use Illuminate\Database\Eloquent\Model;
+
+/**
+ * Class Event.
+ * 
+ * @package App\Models
+ * @author Henry Harris <henry@104101110114121.com>
+ */
+class Event extends Model
 {
     /**
      * The attributes that are mass assignable.
@@ -10,7 +18,7 @@ class Event
      * @var array
      */
     protected $fillable = [
-        'name',
+        'title',
         'start',
         'end',
         'location',
